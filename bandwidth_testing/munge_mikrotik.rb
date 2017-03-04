@@ -6,28 +6,57 @@ infilename = ARGV.pop
 abort "usage:   munge_mikrotik.rb <filename>" if !infilename
 
 reset = true
+s = nil
+l = ""
+
 File.open( infilename, 'r' ) { |f|
+
+  puts "["
 
   begin
     while line = f.readline do
 
-      stamp,rest = line.strip.split(/\s{2,}/)
+      stamp,rest = line.split(/\s{2,}/)
 
       if rest
         if reset
           reset = false
-          print stamp, " "
         end
-        print rest
+
+        s = stamp unless s
+
+        l += rest + " "
+
       else
-        print "\n" unless reset
+        unless reset
+        ## Break out the keys in the Mikrotik format
+        puts "{ \"time\": \"#{stamp}\","
+
+        bits = l.split(/\s{1}(?=[\w\-]*=)/)
+
+        puts bits.select{ |b|
+          b =~ /=/
+        }.map { |b|
+          key,val = b.split(/=/)
+
+
+          val = "\"#{val}\"" unless val =~ /^\"/
+
+          "    \"%s\" : %s" % [key, val]
+
+        }.join(",\n")
+
+
+        puts "},"
+        end
         reset = true
+        s = nil
+        l = ""
       end
 
     end
   rescue EOFError
-    puts
-    break
   end
 
+  puts "]"
 }

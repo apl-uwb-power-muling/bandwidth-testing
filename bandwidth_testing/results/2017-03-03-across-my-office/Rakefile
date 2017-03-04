@@ -1,7 +1,9 @@
 
 
+task :default => :munge
+
 task :munge do
-  sh "../../munge_mikrotik.rb  stimpy_20170303_131800.txt > stimpy_20170303_131800_munged.txt"
-  sh "../../munge_mikrotik.rb ren_20170303_131800.txt > ren_20170303_131800_munged.txt"
+  sh "../../munge_mikrotik.rb  stimpy_20170303_131800.txt > stimpy_20170303_131800_munged.json"
+  sh "../../munge_mikrotik.rb ren_20170303_131800.txt > ren_20170303_131800_munged.json"
   sh "../../munge_iperf.rb iperf-132700.txt  > iperf-132700_munged.txt"
 end
