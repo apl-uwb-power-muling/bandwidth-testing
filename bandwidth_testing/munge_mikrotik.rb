@@ -9,9 +9,9 @@ reset = true
 s = nil
 l = ""
 
-File.open( infilename, 'r' ) { |f|
+out = []
 
-  puts "["
+File.open( infilename, 'r' ) { |f|
 
   begin
     while line = f.readline do
@@ -30,11 +30,11 @@ File.open( infilename, 'r' ) { |f|
       else
         unless reset
         ## Break out the keys in the Mikrotik format
-        puts "{ \"time\": \"#{stamp}\","
+        str = "{ \"date\": \"#{stamp}\","
 
-        bits = l.split(/\s{1}(?=[\w\-]*=)/)
+        bits = l.split(/\s{1}(?=[\w\-\.]*=)/)
 
-        puts bits.select{ |b|
+        str += bits.select{ |b|
           b =~ /=/
         }.map { |b|
           key,val = b.split(/=/)
@@ -47,8 +47,10 @@ File.open( infilename, 'r' ) { |f|
         }.join(",\n")
 
 
-        puts "},"
+        str += "}"
         end
+
+        out << str
         reset = true
         s = nil
         l = ""
@@ -58,5 +60,5 @@ File.open( infilename, 'r' ) { |f|
   rescue EOFError
   end
 
-  puts "]"
+  puts "[#{out.join(',')}]"
 }
